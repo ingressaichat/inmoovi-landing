@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inmoovi — Domine sua corrida no WhatsApp</title>
+    <meta
+      name="description"
+      content="Inmoovi conecta seu WhatsApp ao Strava para monitorar atividades, criar rotinas e dominar áreas no mapa com consistência e velocidade."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <div class="brand">
+          <span class="brand-mark">inmoovi</span>
+        </div>
+        <div class="nav-actions">
+          <a class="nav-link" href="#mapa">Mapa</a>
+          <a class="nav-link" href="#funcoes">Funcoes</a>
+          <a class="nav-link" href="#fluxo">Fluxo</a>
+          <a class="button button-ghost" href="https://wa.me/5534992423942?text=Quero%20conectar%20o%20Inmoovi" target="_blank" rel="noreferrer">Conectar</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">WhatsApp + Strava + Inmoovi</p>
+          <h1>Treinos inteligentes, dominios reais, tudo no WhatsApp.</h1>
+          <p class="lead">
+            A Inmoovi usa a API oficial do WhatsApp e a API do Strava para monitorar corridas, analisar desempenho e entregar
+            seu treino como sticker pronto para story. Consistencia e velocidade viram dominio no mapa.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="https://wa.me/5534992423942?text=Quero%20conectar%20o%20Inmoovi" target="_blank" rel="noreferrer">
+              Conectar no WhatsApp
+            </a>
+            <a class="button button-ghost" href="#mapa">Explorar mapa</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <span class="stat-title">Dominios ativos</span>
+              <span class="stat-value">+280 hex</span>
+            </div>
+            <div class="stat">
+              <span class="stat-title">Rotinas criadas</span>
+              <span class="stat-value">1 clique</span>
+            </div>
+            <div class="stat">
+              <span class="stat-title">Sticker pronto</span>
+              <span class="stat-value">PNG + Story</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-card">
+            <img src="assets/inmoovi-logo.svg" alt="Logo Inmoovi" />
+            <div>
+              <p class="card-title">Inmoovi Sticker</p>
+              <p class="card-subtitle">Nome + dados do treino + logo Inmoovi</p>
+            </div>
+          </div>
+          <div class="hero-card accent">
+            <div>
+              <p class="card-title">Entrega automatica</p>
+              <p class="card-subtitle">Terminou a atividade? O WhatsApp entrega o resumo na hora.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="mapa" class="map-section">
+        <div class="section-header">
+          <h2>Mapa de dominio por consistencia e velocidade</h2>
+          <p>
+            Cada hexagono mostra quem domina a area. Quanto mais constancia e velocidade, mais o mapa fica azul Inmoovi.
+          </p>
+        </div>
+        <div class="map-wrapper">
+          <div class="map-panel">
+            <svg class="hex-grid" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <pattern id="hex" width="40" height="34" patternUnits="userSpaceOnUse">
+                  <path d="M20 0 L40 10 L40 24 L20 34 L0 24 L0 10 Z" fill="none" stroke="rgba(120, 140, 170, 0.25)" stroke-width="1" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#hex)" />
+            </svg>
+            <div class="hex-dots">
+              <span class="hex blue" style="--x: 12%; --y: 22%;"></span>
+              <span class="hex blue" style="--x: 28%; --y: 38%;"></span>
+              <span class="hex blue" style="--x: 46%; --y: 28%;"></span>
+              <span class="hex blue" style="--x: 62%; --y: 42%;"></span>
+              <span class="hex blue" style="--x: 78%; --y: 26%;"></span>
+              <span class="hex" style="--x: 20%; --y: 60%;"></span>
+              <span class="hex" style="--x: 40%; --y: 70%;"></span>
+              <span class="hex" style="--x: 70%; --y: 68%;"></span>
+            </div>
+            <div class="map-cards">
+              <article class="map-card reveal" style="--delay: 0.1s;">
+                <h3>Zona Oeste</h3>
+                <p>Consistencia 92% • Media 4'35"/km</p>
+              </article>
+              <article class="map-card reveal" style="--delay: 0.2s;">
+                <h3>Parque Central</h3>
+                <p>Velocidade 4'12"/km • 18 treinos</p>
+              </article>
+              <article class="map-card reveal" style="--delay: 0.3s;">
+                <h3>Orla Azul</h3>
+                <p>Dominio por 6 semanas seguidas</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="funcoes" class="features">
+        <div class="section-header">
+          <h2>Funcoes que vivem no WhatsApp</h2>
+          <p>Minimalista por fora. Potente por dentro.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card reveal" style="--delay: 0.1s;">
+            <h3>Conectar Strava</h3>
+            <p>Login rapido e seguro para importar suas corridas.</p>
+          </article>
+          <article class="feature-card reveal" style="--delay: 0.2s;">
+            <h3>Monitoramento em tempo real</h3>
+            <p>Resumo automatico de pace, distancia e tempo no WhatsApp.</p>
+          </article>
+          <article class="feature-card reveal" style="--delay: 0.3s;">
+            <h3>Analise inteligente</h3>
+            <p>Insights por consistencia, ritmo e evolucao semanal.</p>
+          </article>
+          <article class="feature-card reveal" style="--delay: 0.4s;">
+            <h3>Rotina de treino</h3>
+            <p>Crie treinos com objetivos claros e alertas no chat.</p>
+          </article>
+          <article class="feature-card reveal" style="--delay: 0.5s;">
+            <h3>Sticker Inmoovi</h3>
+            <p>Receba um PNG com nome, dados e logo para stories.</p>
+          </article>
+          <article class="feature-card reveal" style="--delay: 0.6s;">
+            <h3>Mapa de dominio</h3>
+            <p>Hexagonos azuis mostram quem domina cada area.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="fluxo" class="flow">
+        <div class="section-header">
+          <h2>Fluxo de dados e operacao</h2>
+          <p>Rotas claras, listas objetivas e menus que fazem sentido.</p>
+        </div>
+        <div class="flow-grid">
+          <div class="flow-card reveal" style="--delay: 0.1s;">
+            <h3>1. Conexao</h3>
+            <ul>
+              <li>WhatsApp API oficial</li>
+              <li>OAuth Strava</li>
+              <li>Mapa e preferencia de treinos</li>
+            </ul>
+          </div>
+          <div class="flow-card reveal" style="--delay: 0.2s;">
+            <h3>2. Monitoramento</h3>
+            <ul>
+              <li>Webhook de atividade</li>
+              <li>Analise de dados em tempo real</li>
+              <li>Alertas e insights no chat</li>
+            </ul>
+          </div>
+          <div class="flow-card reveal" style="--delay: 0.3s;">
+            <h3>3. Dominio + Sticker</h3>
+            <ul>
+              <li>Hexagonos por consistencia</li>
+              <li>Pontos extras por velocidade</li>
+              <li>Sticker PNG entregue no WhatsApp</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div class="cta-card">
+          <div>
+            <h2>Pronto para dominar seu mapa?</h2>
+            <p>Conecte seu WhatsApp e deixe a Inmoovi cuidar do resto.</p>
+          </div>
+          <a class="button" href="https://wa.me/5534992423942?text=Quero%20conectar%20o%20Inmoovi" target="_blank" rel="noreferrer">
+            Conectar agora
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <span class="brand-mark">inmoovi</span>
+        <p>App no WhatsApp para treinos inteligentes e dominio de areas.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#funcoes">Funcoes</a>
+        <a href="#mapa">Mapa</a>
+        <a href="#fluxo">Fluxo</a>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
