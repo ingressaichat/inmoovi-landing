@@ -100,9 +100,9 @@
 
     <footer class="footer">
       <div class="footer-links">
-        <a href="#">Privacidade</a>
-        <a href="#">Termos</a>
-        <a href="#">Contato</a>
+        <button class="btn-link" data-open-modal="privacy">Privacidade</button>
+        <button class="btn-link" data-open-modal="terms">Termos</button>
+        <button class="btn-link" data-open-modal="data">Exclusao de dados</button>
       </div>
       <p class="footer-note">Inmoovi nao e afiliado ao Strava.</p>
     </footer>
@@ -143,6 +143,36 @@
         <button class="modal-close" data-close-modal>Fechar</button>
         <h3>Demo rapida</h3>
         <p>Explore o mapa, clique nos hexes e envie um lugar pro WhatsApp.</p>
+      </div>
+    </div>
+
+    <div class="modal" id="modal-terms" aria-hidden="true">
+      <div class="modal-card">
+        <button class="modal-close" data-close-modal>Fechar</button>
+        <h3>Termos de uso</h3>
+        <p>Ao usar a Inmoovi, voce concorda em seguir as regras de uso do WhatsApp e do Strava.</p>
+        <p>Voce e responsavel pelos dados enviados e pelas metas definidas no app.</p>
+        <p>Podemos atualizar estes termos para melhorar a experiencia.</p>
+      </div>
+    </div>
+
+    <div class="modal" id="modal-privacy" aria-hidden="true">
+      <div class="modal-card">
+        <button class="modal-close" data-close-modal>Fechar</button>
+        <h3>Politica de privacidade</h3>
+        <p>Coletamos dados de treino do Strava apenas para gerar analises e stickers.</p>
+        <p>Seus dados nao sao vendidos e podem ser removidos a qualquer momento.</p>
+        <p>Utilizamos a API oficial do WhatsApp para entregar mensagens e arquivos.</p>
+      </div>
+    </div>
+
+    <div class="modal" id="modal-data" aria-hidden="true">
+      <div class="modal-card">
+        <button class="modal-close" data-close-modal>Fechar</button>
+        <h3>Exclusao de dados</h3>
+        <p>Para excluir seus dados, envie a mensagem \"inmoovi:delete\" no WhatsApp.</p>
+        <p>Em ate 7 dias, apagamos historico de treinos e preferencias.</p>
+        <p>Se precisar de ajuda, fale conosco pelo WhatsApp.</p>
       </div>
     </div>
 
