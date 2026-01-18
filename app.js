@@ -1,4 +1,6 @@
-const API_BASE = new URLSearchParams(location.search).get("api") || "http://localhost:3000";
+const API_BASE =
+  new URLSearchParams(location.search).get("api") ||
+  "https://inmoovi-backend-production.up.railway.app";
 const PUBLIC_WHATSAPP = "5534992423942";
 
 const mapEl = document.getElementById("map");
@@ -15,41 +17,6 @@ const modalCloseButtons = document.querySelectorAll("[data-close-modal]");
 const whatsappCtas = document.querySelectorAll("[data-whatsapp]");
 
 const mocks = {
-  territories: [
-    {
-      id: "t1",
-      label: "Parque Central",
-      lat: -19.749,
-      lng: -47.933,
-      score: 0.92,
-      streakWeeks: 4,
-      consistency: 95,
-      peak: "18-20h",
-      goodFor: "longao / leve",
-    },
-    {
-      id: "t2",
-      label: "Orla Azul",
-      lat: -19.751,
-      lng: -47.925,
-      score: 0.81,
-      streakWeeks: 3,
-      consistency: 88,
-      peak: "06-08h",
-      goodFor: "tiros / ritmo",
-    },
-    {
-      id: "t3",
-      label: "Zona Sul",
-      lat: -19.757,
-      lng: -47.938,
-      score: 0.77,
-      streakWeeks: 2,
-      consistency: 82,
-      peak: "19-21h",
-      goodFor: "corrida leve",
-    },
-  ],
   places: [
     {
       id: "p1",
@@ -87,10 +54,12 @@ const mocks = {
 const state = {
   territories: [],
   places: [],
+  challenges: [],
   activeChip: "places",
   map: null,
   territoryLayer: null,
   placesLayer: null,
+  challengeLayer: null,
 };
 
 const getWhatsAppLink = (text) => {
@@ -116,6 +85,13 @@ const fetchPlaces = async ({ city }) => {
   const url = `${API_BASE}/api/map/places?city=${encodeURIComponent(city)}`;
   const response = await fetch(url);
   if (!response.ok) throw new Error("places fetch failed");
+  return response.json();
+};
+
+const fetchChallenges = async () => {
+  const url = `${API_BASE}/api/challenges`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("challenges fetch failed");
   return response.json();
 };
 
@@ -155,15 +131,19 @@ const closeModal = (modal) => {
 };
 
 const buildTerritorySheet = (territory) => {
-  const link = getWhatsAppLink(`inmoovi:start source=landing territory=${territory.id}`);
+  const dominance = territory.consistency >= 90 ? "Consistencia" : "Velocidade";
+  const link = getWhatsAppLink(
+    `inmoovi:start source=landing territory=${territory.id} takeover=true`
+  );
   return `
     <h4>🟦 ${territory.label}</h4>
+    <div class="place-meta">Dominio: ${dominance}</div>
     <div class="place-meta">Streak: ${territory.streakWeeks} semanas</div>
     <div class="place-meta">Consistencia: ${territory.consistency}/100</div>
     <div class="place-meta">Pico: ${territory.peak}</div>
     <div class="place-meta">Bom pra: ${territory.goodFor}</div>
     <div class="sheet-actions">
-      <a class="btn btn-primary" href="${link}">Dominar esse lugar</a>
+      <a class="btn btn-primary" href="${link}">Tomar posto</a>
       <button class="btn btn-ghost" data-scroll="lugares">Ver lugares perto</button>
     </div>
   `;
@@ -178,6 +158,19 @@ const buildPlaceSheet = (place) => {
     <div class="place-meta">Melhor horario: ${place.bestTime}</div>
     <div class="sheet-actions">
       <a class="btn btn-primary" href="${link}">Enviar pro meu WhatsApp</a>
+      <button class="btn btn-ghost" data-scroll="mapa">Voltar ao mapa</button>
+    </div>
+  `;
+};
+
+const buildChallengeSheet = (challenge) => {
+  const link = getWhatsAppLink(`inmoovi:start source=landing challenge=${challenge.id}`);
+  return `
+    <h4>🏁 ${challenge.title}</h4>
+    <div class="place-meta">${challenge.goal}</div>
+    <div class="place-meta">Tag: ${challenge.tag}</div>
+    <div class="sheet-actions">
+      <a class="btn btn-primary" href="${link}">Entrar no desafio</a>
       <button class="btn btn-ghost" data-scroll="mapa">Voltar ao mapa</button>
     </div>
   `;
@@ -208,9 +201,15 @@ const initMap = () => {
     maxZoom: 18,
     attribution: "&copy; OpenStreetMap",
   }).addTo(map);
+  L.tileLayer("https://heatmap-external-{s}.strava.com/tiles/run/hot/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    opacity: 0.65,
+    attribution: "Heatmap data &copy; Strava",
+  }).addTo(map);
   state.map = map;
   state.territoryLayer = L.layerGroup().addTo(map);
   state.placesLayer = L.layerGroup().addTo(map);
+  state.challengeLayer = L.layerGroup().addTo(map);
   return map;
 };
 
@@ -248,6 +247,26 @@ const renderPlacesPins = (places) => {
   });
 };
 
+const renderChallenges = (challenges) => {
+  state.challengeLayer.clearLayers();
+  challenges.forEach((challenge) => {
+    if (typeof challenge.lat !== "number" || typeof challenge.lng !== "number") {
+      return;
+    }
+    const icon = L.divIcon({
+      className: "",
+      html: `<div class="challenge-marker">🏁</div>`,
+      iconSize: [36, 36],
+      iconAnchor: [18, 18],
+    });
+    const marker = L.marker([challenge.lat, challenge.lng], { icon });
+    marker.on("click", () => {
+      openSheet(buildChallengeSheet(challenge));
+    });
+    marker.addTo(state.challengeLayer);
+  });
+};
+
 const highlightDominant = () => {
   const top = [...state.territories].sort((a, b) => b.score - a.score).slice(0, 2);
   document.querySelectorAll(".hex-marker").forEach((hex) => {
@@ -280,6 +299,16 @@ const highlightBestTime = () => {
   });
 };
 
+const renderChallengesBadges = (challenges) => {
+  mapBadges.innerHTML = "";
+  challenges.forEach((challenge) => {
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = challenge.tag || challenge.title;
+    mapBadges.appendChild(badge);
+  });
+};
+
 const updateChipState = (chip) => {
   chipButtons.forEach((button) => button.classList.remove("is-active"));
   chip.classList.add("is-active");
@@ -289,22 +318,26 @@ const updateChipState = (chip) => {
 
   if (state.activeChip === "places") {
     state.map.addLayer(state.placesLayer);
+    state.map.removeLayer(state.challengeLayer);
     highlightDominant();
   }
 
   if (state.activeChip === "dominance") {
     highlightDominant();
     state.map.removeLayer(state.placesLayer);
+    state.map.removeLayer(state.challengeLayer);
   }
 
   if (state.activeChip === "best-time") {
     highlightBestTime();
     state.map.removeLayer(state.placesLayer);
+    state.map.removeLayer(state.challengeLayer);
   }
 
   if (state.activeChip === "challenges") {
     highlightDominant();
     state.map.addLayer(state.placesLayer);
+    state.map.addLayer(state.challengeLayer);
   }
 };
 
@@ -385,32 +418,38 @@ const setupSheetDrag = () => {
 
 const loadData = async () => {
   showSkeleton();
-  try {
-    const map = state.map;
-    const bounds = map.getBounds();
-    const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
-    const [territories, places] = await Promise.all([
-      fetchTerritories({ bbox, z: map.getZoom() }),
-      fetchPlaces({ city: "Uberlandia" }),
-    ]);
-    state.territories = territories;
-    state.places = places;
-  } catch (error) {
-    state.territories = mocks.territories;
-    state.places = mocks.places;
-  } finally {
-    hideSkeleton();
-  }
+  const map = state.map;
+  const bounds = map.getBounds();
+  const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
+
+  const results = await Promise.allSettled([
+    fetchTerritories({ bbox, z: map.getZoom() }),
+    fetchPlaces({ city: "Uberlandia" }),
+    fetchChallenges(),
+  ]);
+
+  const [territoriesResult, placesResult, challengesResult] = results;
+  state.territories = territoriesResult.status === "fulfilled" ? territoriesResult.value : [];
+  state.places = placesResult.status === "fulfilled" ? placesResult.value : mocks.places;
+  state.challenges = challengesResult.status === "fulfilled" ? challengesResult.value : [];
+
+  hideSkeleton();
 
   renderTerritories(state.territories);
   renderPlacesPins(state.places);
+  renderChallenges(state.challenges);
   renderPlaces(state.places);
+  renderChallengesBadges(state.challenges);
   highlightDominant();
 };
 
 const init = () => {
   setWhatsappLinks();
   initMap();
+  const activeChip = document.querySelector(".chip.is-active");
+  if (activeChip) {
+    updateChipState(activeChip);
+  }
   setupChipListeners();
   setupPlaceListeners();
   setupSheetButtons();
