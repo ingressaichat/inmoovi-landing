@@ -47,6 +47,9 @@
           <button class="chip" data-chip="challenges">Desafios ativos</button>
         </div>
         <div class="map-shell">
+          <button class="map-toggle" id="map-toggle" type="button" aria-pressed="false">
+            Fechar mapa
+          </button>
           <div id="map" class="map"></div>
           <div class="map-badges" aria-hidden="true"></div>
           <div class="map-skeleton" id="map-skeleton">
@@ -76,13 +79,39 @@
         <div class="sticker-inner">
           <div class="sticker-preview">
             <div class="sticker-card">
-              <div class="sticker-logo">inmoovi</div>
-              <div class="sticker-stats">
-                <span>7.4 km</span>
-                <span>4'45"/km</span>
-                <span>35:12</span>
+              <div class="sticker-header">
+                <div class="sticker-brand">
+                  <svg viewBox="0 0 64 64" aria-hidden="true">
+                    <circle cx="46" cy="12" r="6" fill="currentColor" />
+                    <path d="M10 34 C20 26 34 24 50 30 C40 34 32 42 22 46 C18 48 14 46 10 44 Z" fill="currentColor" />
+                    <path d="M26 40 C32 42 40 48 44 56 C34 54 28 54 22 58 C24 50 24 44 26 40 Z" fill="currentColor" />
+                  </svg>
+                  <div>
+                    <div class="sticker-brand-title">INMOOVI</div>
+                    <div class="sticker-brand-subtitle">Corrida da tarde</div>
+                  </div>
+                </div>
+                <div class="sticker-date">20 de jul.</div>
               </div>
-              <div class="sticker-name">Treino de Hoje</div>
+              <div class="sticker-route">
+                <svg viewBox="0 0 200 200" aria-hidden="true">
+                  <path d="M60 20 L80 36 L92 64 L108 82 L120 120 L140 150 L150 180" stroke="currentColor" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div class="sticker-metrics">
+                <div>
+                  <div class="metric-value">1.94</div>
+                  <div class="metric-label">km</div>
+                </div>
+                <div>
+                  <div class="metric-value">12:25</div>
+                  <div class="metric-label">tempo</div>
+                </div>
+                <div>
+                  <div class="metric-value">6:25</div>
+                  <div class="metric-label">pace</div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="sticker-content">
