@@ -10,6 +10,7 @@ const overlay = document.getElementById("overlay");
 const sheet = document.getElementById("bottom-sheet");
 const sheetContent = document.getElementById("sheet-content");
 const mapBadges = document.querySelector(".map-badges");
+const mapToggle = document.getElementById("map-toggle");
 
 const chipButtons = document.querySelectorAll(".chip");
 const modalTriggers = document.querySelectorAll("[data-open-modal]");
@@ -247,10 +248,24 @@ const renderPlacesPins = (places) => {
   });
 };
 
+const getChallengeCoords = (challenge) => {
+  if (typeof challenge.lat === "number" && typeof challenge.lng === "number") {
+    return { lat: challenge.lat, lng: challenge.lng };
+  }
+  if (challenge.territoryId) {
+    const match = state.territories.find((territory) => territory.id === challenge.territoryId);
+    if (match) {
+      return { lat: match.lat, lng: match.lng };
+    }
+  }
+  return null;
+};
+
 const renderChallenges = (challenges) => {
   state.challengeLayer.clearLayers();
   challenges.forEach((challenge) => {
-    if (typeof challenge.lat !== "number" || typeof challenge.lng !== "number") {
+    const coords = getChallengeCoords(challenge);
+    if (!coords) {
       return;
     }
     const icon = L.divIcon({
@@ -259,7 +274,7 @@ const renderChallenges = (challenges) => {
       iconSize: [36, 36],
       iconAnchor: [18, 18],
     });
-    const marker = L.marker([challenge.lat, challenge.lng], { icon });
+    const marker = L.marker([coords.lat, coords.lng], { icon });
     marker.on("click", () => {
       openSheet(buildChallengeSheet(challenge));
     });
@@ -309,12 +324,30 @@ const renderChallengesBadges = (challenges) => {
   });
 };
 
+const ensureChallenges = (challenges, places) => {
+  if (challenges.length >= 3) return challenges;
+  const needed = 3 - challenges.length;
+  const picks = [...places]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .slice(0, needed)
+    .map((place, index) => ({
+      id: `fallback-${index + 1}`,
+      title: `${place.name} - Desafio da semana`,
+      goal: "Complete 5 km em qualquer ritmo",
+      tag: "Desafio 5k",
+      lat: place.lat,
+      lng: place.lng,
+    }));
+  return [...challenges, ...picks];
+};
+
 const updateChipState = (chip) => {
   chipButtons.forEach((button) => button.classList.remove("is-active"));
   chip.classList.add("is-active");
   state.activeChip = chip.dataset.chip;
 
-  mapBadges.classList.toggle("is-visible", state.activeChip === "challenges");
+  const isCollapsed = mapEl.parentElement.classList.contains("is-collapsed");
+  mapBadges.classList.toggle("is-visible", state.activeChip === "challenges" && !isCollapsed);
 
   if (state.activeChip === "places") {
     state.map.addLayer(state.placesLayer);
@@ -416,6 +449,21 @@ const setupSheetDrag = () => {
   });
 };
 
+const setupMapToggle = () => {
+  if (!mapToggle) return;
+  mapToggle.addEventListener("click", () => {
+    const isCollapsed = mapEl.parentElement.classList.toggle("is-collapsed");
+    mapToggle.setAttribute("aria-pressed", isCollapsed ? "true" : "false");
+    mapToggle.textContent = isCollapsed ? "Abrir mapa" : "Fechar mapa";
+    mapBadges.classList.toggle("is-visible", state.activeChip === "challenges" && !isCollapsed);
+    if (!isCollapsed) {
+      setTimeout(() => {
+        state.map.invalidateSize();
+      }, 200);
+    }
+  });
+};
+
 const loadData = async () => {
   showSkeleton();
   const map = state.map;
@@ -431,7 +479,8 @@ const loadData = async () => {
   const [territoriesResult, placesResult, challengesResult] = results;
   state.territories = territoriesResult.status === "fulfilled" ? territoriesResult.value : [];
   state.places = placesResult.status === "fulfilled" ? placesResult.value : mocks.places;
-  state.challenges = challengesResult.status === "fulfilled" ? challengesResult.value : [];
+  const baseChallenges = challengesResult.status === "fulfilled" ? challengesResult.value : [];
+  state.challenges = ensureChallenges(baseChallenges, state.places);
 
   hideSkeleton();
 
@@ -456,6 +505,7 @@ const init = () => {
   setupOverlay();
   setupModals();
   setupSheetDrag();
+  setupMapToggle();
   loadData();
 };
 
