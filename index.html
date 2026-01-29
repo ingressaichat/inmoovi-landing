@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Inmoovi - Domine a cidade correndo</title>
+    <title>Inmoovi.chat - Coach inteligente no WhatsApp</title>
     <meta
       name="description"
-      content="Inmoovi conecta Strava ao WhatsApp para monitorar corridas, criar rotinas e dominar areas com stickers prontos para story."
+      content="Inmoovi conecta Strava ao WhatsApp para analises avancadas, relatorios PDF premium e stickers de atividades."
     />
     <link
       rel="stylesheet"
@@ -20,64 +20,146 @@
     <header class="topbar">
       <div class="topbar-inner">
         <div class="brand">Inmoovi</div>
-        <div class="topbar-actions">
-          <button class="btn btn-ghost" data-open-modal="demo">Ver demo</button>
-          <a class="btn btn-primary" data-whatsapp="cta" href="#">Conectar no WhatsApp</a>
-        </div>
+        <nav class="topbar-actions">
+          <a class="btn btn-ghost" href="#como-funciona">Como funciona</a>
+          <a class="btn btn-primary" data-whatsapp="cta" href="#">Conectar Strava</a>
+          <a class="btn btn-link" data-whatsapp="cta" href="#">Abrir no WhatsApp</a>
+        </nav>
       </div>
     </header>
 
     <main>
       <section class="hero">
         <div class="hero-content">
-          <h1>Domine a cidade correndo.</h1>
-          <p>Conecte o Strava e receba resumo + sticker pronto no WhatsApp.</p>
+          <p class="eyebrow">Coach inteligente no WhatsApp + Strava</p>
+          <h1>Treinos guiados por dados, direto no seu chat.</h1>
+          <p>
+            Menu rapido, analises avancadas, relatorios PDF premium e stickers de atividades prontos para story.
+          </p>
           <div class="hero-actions">
-            <a class="btn btn-primary" data-whatsapp="cta" href="#">Conectar no WhatsApp</a>
-            <button class="btn btn-link" data-open-modal="how">Como funciona</button>
+            <a class="btn btn-primary" data-whatsapp="cta" href="#">Conectar Strava</a>
+            <a class="btn btn-ghost" data-whatsapp="cta" href="#">Abrir no WhatsApp</a>
+          </div>
+          <div class="hero-pills">
+            <span>WhatsApp Cloud API</span>
+            <span>Analise de consistencia</span>
+            <span>Relatorio PDF premium</span>
           </div>
         </div>
-      </section>
-
-      <section class="map-section" id="mapa">
-        <div class="chip-row" role="tablist" aria-label="Filtros do mapa">
-          <button class="chip is-active" data-chip="places">Lugares pra correr</button>
-          <button class="chip" data-chip="dominance">Mais dominados</button>
-          <button class="chip" data-chip="best-time">Horarios melhores</button>
-          <button class="chip" data-chip="challenges">Desafios ativos</button>
-        </div>
-        <div class="map-shell">
-          <button class="map-toggle" id="map-toggle" type="button" aria-pressed="false">
-            Fechar mapa
-          </button>
-          <div id="map" class="map"></div>
-          <div class="map-badges" aria-hidden="true"></div>
-          <div class="map-skeleton" id="map-skeleton">
-            <div class="skeleton-bar"></div>
-            <div class="skeleton-grid">
-              <div class="skeleton-dot"></div>
-              <div class="skeleton-dot"></div>
-              <div class="skeleton-dot"></div>
+        <div class="hero-proof">
+          <div class="whatsapp-card">
+            <div class="whatsapp-header">Inmoovi Bot</div>
+            <div class="whatsapp-message">
+              Menu rapido:
+              <div class="whatsapp-list">
+                <span>1. Ultimos treinos</span>
+                <span>2. Analise avancada</span>
+                <span>3. Objetivo e rotina</span>
+                <span>4. Relatorio PDF</span>
+              </div>
+            </div>
+            <div class="whatsapp-buttons">
+              <button type="button">Ver desafios</button>
+              <button type="button">Gerar sticker</button>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="places" id="lugares">
+      <section class="steps" id="como-funciona">
         <div class="section-title">
-          <h2>Lugares pra correr</h2>
-          <p>Curadoria rapida para treinos leves, tiros e longao.</p>
+          <h2>Como funciona</h2>
+          <p>Fluxo claro do Strava ao treino.</p>
         </div>
-        <div class="places-grid" id="places-grid">
-          <div class="place-card skeleton"></div>
-          <div class="place-card skeleton"></div>
-          <div class="place-card skeleton"></div>
+        <div class="steps-grid">
+          <article>
+            <span class="step-index">01</span>
+            <h3>Conectar Strava</h3>
+            <p>Login rapido e seguro direto no WhatsApp.</p>
+          </article>
+          <article>
+            <span class="step-index">02</span>
+            <h3>Ver atividades</h3>
+            <p>Resumo de pace, distancia e tempo no chat.</p>
+          </article>
+          <article>
+            <span class="step-index">03</span>
+            <h3>Treino inteligente</h3>
+            <p>Objetivo, rotina e analise do seu progresso.</p>
+          </article>
         </div>
       </section>
 
-      <section class="sticker" id="sticker">
-        <div class="sticker-inner">
-          <div class="sticker-preview">
+      <section class="features">
+        <div class="section-title">
+          <h2>O que voce recebe</h2>
+          <p>Premium por fora. Profundo por dentro.</p>
+        </div>
+        <div class="feature-grid">
+          <article>
+            <h3>Coach inteligente</h3>
+            <p>Sugere objetivo e detecta risco de sobrecarga.</p>
+          </article>
+          <article>
+            <h3>Analises avancadas</h3>
+            <p>Consistencia, ritmo, zonas e evolucao semanal.</p>
+          </article>
+          <article>
+            <h3>Relatorios PDF</h3>
+            <p>Historico + evolucao com graficos claros.</p>
+          </article>
+          <article>
+            <h3>Stickers de atividades</h3>
+            <p>Logo, stats e trajeto prontos para story.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="map-section" id="desafios">
+        <div class="section-title">
+          <h2>Mapa + desafios reais em Uberaba</h2>
+          <p>Desafios semanais nas areas mais corridas.</p>
+        </div>
+        <div class="map-layout">
+          <div class="map-shell">
+            <div id="map" class="map"></div>
+            <div class="map-skeleton" id="map-skeleton">
+              <div class="skeleton-bar"></div>
+            </div>
+          </div>
+          <aside class="challenge-panel" id="challenge-panel">
+            <div class="panel-header">
+              <h3>Desafios da semana</h3>
+              <button class="btn btn-ghost" id="drawer-open" type="button">Ver no mapa</button>
+            </div>
+            <div class="challenge-list" id="challenge-list"></div>
+            <div class="empty-state" id="challenge-empty">
+              Sem desafios ativos no momento.
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="proofs" id="provas">
+        <div class="section-title">
+          <h2>Provas do que o bot entrega</h2>
+          <p>Conteudos prontos para compartilhar e analisar.</p>
+        </div>
+        <div class="proofs-grid">
+          <div class="proof-card">
+            <div class="pdf-preview">
+              <div class="pdf-header">Relatorio Premium</div>
+              <div class="pdf-chart"></div>
+              <div class="pdf-lines">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <h4>PDF Historico + Evolucao</h4>
+            <p>Graficos claros com diagnostico do seu treino.</p>
+          </div>
+          <div class="proof-card">
             <div class="sticker-card">
               <div class="sticker-header">
                 <div class="sticker-brand">
@@ -113,12 +195,34 @@
                 </div>
               </div>
             </div>
+            <h4>Sticker minimalista</h4>
+            <p>PNG transparente com logo, stats e trajeto.</p>
           </div>
-          <div class="sticker-content">
-            <h2>Receba um sticker transparente pronto pra story.</h2>
-            <p>Compartilhe seu treino direto do WhatsApp sem editar nada.</p>
-            <button class="btn btn-primary" data-open-modal="templates">Ver templates</button>
+          <div class="proof-card">
+            <div class="whatsapp-card compact">
+              <div class="whatsapp-header">Inmoovi Bot</div>
+              <div class="whatsapp-message">
+                Analise avancada:
+                <ul>
+                  <li>Consistencia: 92%</li>
+                  <li>Risco de carga: baixo</li>
+                  <li>Ritmo ideal: 4'50"/km</li>
+                </ul>
+              </div>
+            </div>
+            <h4>Insights no chat</h4>
+            <p>Diagnostico rapido para ajuste de treino.</p>
           </div>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div class="cta-card">
+          <div>
+            <h2>Pronto para treinar com um coach inteligente?</h2>
+            <p>Conecte o Strava e receba tudo no WhatsApp.</p>
+          </div>
+          <a class="btn btn-primary" data-whatsapp="cta" href="#">Conectar Strava</a>
         </div>
       </section>
     </main>
@@ -139,45 +243,21 @@
       <div class="sheet-content" id="sheet-content"></div>
     </div>
 
-    <div class="modal" id="modal-how" aria-hidden="true">
-      <div class="modal-card">
-        <button class="modal-close" data-close-modal>Fechar</button>
-        <h3>Como funciona</h3>
-        <ol>
-          <li>Conecte Strava e WhatsApp.</li>
-          <li>Corra e receba o resumo automatico.</li>
-          <li>Ganhe dominio no mapa e sticker.</li>
-        </ol>
+    <div class="drawer" id="drawer" aria-hidden="true">
+      <div class="drawer-header">
+        <h3>Desafios no mapa</h3>
+        <button class="btn btn-ghost" id="drawer-close" type="button">Fechar</button>
       </div>
-    </div>
-
-    <div class="modal" id="modal-templates" aria-hidden="true">
-      <div class="modal-card">
-        <button class="modal-close" data-close-modal>Fechar</button>
-        <h3>Templates de sticker</h3>
-        <div class="template-grid">
-          <div class="template-card">Minimal</div>
-          <div class="template-card">Bold</div>
-          <div class="template-card">Night</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal" id="modal-demo" aria-hidden="true">
-      <div class="modal-card">
-        <button class="modal-close" data-close-modal>Fechar</button>
-        <h3>Demo rapida</h3>
-        <p>Explore o mapa, clique nos hexes e envie um lugar pro WhatsApp.</p>
-      </div>
+      <div class="challenge-list" id="drawer-list"></div>
+      <div class="empty-state" id="drawer-empty">Sem desafios ativos no momento.</div>
     </div>
 
     <div class="modal" id="modal-terms" aria-hidden="true">
       <div class="modal-card">
         <button class="modal-close" data-close-modal>Fechar</button>
         <h3>Termos de uso</h3>
-        <p>Ao usar a Inmoovi, voce concorda em seguir as regras de uso do WhatsApp e do Strava.</p>
-        <p>Voce e responsavel pelos dados enviados e pelas metas definidas no app.</p>
-        <p>Podemos atualizar estes termos para melhorar a experiencia.</p>
+        <p>Ao usar a Inmoovi, voce concorda com as regras de uso do WhatsApp e do Strava.</p>
+        <p>Voce e responsavel pelos dados enviados e metas definidas no app.</p>
       </div>
     </div>
 
@@ -185,9 +265,8 @@
       <div class="modal-card">
         <button class="modal-close" data-close-modal>Fechar</button>
         <h3>Politica de privacidade</h3>
-        <p>Coletamos dados de treino do Strava apenas para gerar analises e stickers.</p>
+        <p>Coletamos dados de treino do Strava para gerar analises, relatorios e stickers.</p>
         <p>Seus dados nao sao vendidos e podem ser removidos a qualquer momento.</p>
-        <p>Utilizamos a API oficial do WhatsApp para entregar mensagens e arquivos.</p>
       </div>
     </div>
 
@@ -195,9 +274,8 @@
       <div class="modal-card">
         <button class="modal-close" data-close-modal>Fechar</button>
         <h3>Exclusao de dados</h3>
-        <p>Para excluir seus dados, envie a mensagem \"inmoovi:delete\" no WhatsApp.</p>
-        <p>Em ate 7 dias, apagamos historico de treinos e preferencias.</p>
-        <p>Se precisar de ajuda, fale conosco pelo WhatsApp.</p>
+        <p>Para excluir seus dados, envie "inmoovi:delete" no WhatsApp.</p>
+        <p>Apagamos historico de treinos e preferencias em ate 7 dias.</p>
       </div>
     </div>
 

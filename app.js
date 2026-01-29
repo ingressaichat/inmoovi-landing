@@ -1,72 +1,64 @@
-const API_BASE =
-  new URLSearchParams(location.search).get("api") ||
-  "https://inmoovi-backend-production.up.railway.app";
+const API_BASE = "https://inmoovi-backend-production.up.railway.app";
 const PUBLIC_WHATSAPP = "5534992423942";
 
 const mapEl = document.getElementById("map");
 const mapSkeleton = document.getElementById("map-skeleton");
-const placesGrid = document.getElementById("places-grid");
 const overlay = document.getElementById("overlay");
 const sheet = document.getElementById("bottom-sheet");
 const sheetContent = document.getElementById("sheet-content");
-const mapBadges = document.querySelector(".map-badges");
-const mapToggle = document.getElementById("map-toggle");
-
-const chipButtons = document.querySelectorAll(".chip");
+const challengeList = document.getElementById("challenge-list");
+const drawerList = document.getElementById("drawer-list");
+const challengeEmpty = document.getElementById("challenge-empty");
+const drawerEmpty = document.getElementById("drawer-empty");
+const drawer = document.getElementById("drawer");
+const drawerOpen = document.getElementById("drawer-open");
+const drawerClose = document.getElementById("drawer-close");
 const modalTriggers = document.querySelectorAll("[data-open-modal]");
 const modalCloseButtons = document.querySelectorAll("[data-close-modal]");
 const whatsappCtas = document.querySelectorAll("[data-whatsapp]");
 
+const state = {
+  map: null,
+  challengeLayer: null,
+  challenges: [],
+  places: [],
+  territories: [],
+};
+
 const mocks = {
-  places: [
+  challenges: [
     {
-      id: "p1",
-      name: "Parque do Sabia",
-      lat: -19.744,
-      lng: -47.936,
-      image: "",
-      tags: ["plano", "iluminado"],
-      bestTime: "18-20h",
-      description: "Otimo pra corrida leve e longao.",
+      id: "c1",
+      title: "Parque do Sabia - 5K",
+      location: "Parque do Sabia",
+      coords: { lat: -19.744, lng: -47.936 },
+      rules: "Complete 5 km em qualquer ritmo",
+      endsIn: "6 dias",
+      link: "inmoovi:start source=landing challenge=c1",
     },
     {
-      id: "p2",
-      name: "Pista Sul",
-      lat: -19.758,
-      lng: -47.928,
-      image: "",
-      tags: ["tiros", "rapido"],
-      bestTime: "06-08h",
-      description: "Pista mais rapida da cidade.",
+      id: "c2",
+      title: "Pista Sul - Ritmo",
+      location: "Pista Sul",
+      coords: { lat: -19.758, lng: -47.928 },
+      rules: "Tente manter o ritmo constante",
+      endsIn: "6 dias",
+      link: "inmoovi:start source=landing challenge=c2",
     },
     {
-      id: "p3",
-      name: "Avenida Azul",
-      lat: -19.752,
-      lng: -47.918,
-      image: "",
-      tags: ["longao", "seguro"],
-      bestTime: "19-21h",
-      description: "Ideal para longoes e ritmo constante.",
+      id: "c3",
+      title: "Avenida Azul - Longao",
+      location: "Avenida Azul",
+      coords: { lat: -19.752, lng: -47.918 },
+      rules: "Longao acima de 8 km",
+      endsIn: "6 dias",
+      link: "inmoovi:start source=landing challenge=c3",
     },
   ],
 };
 
-const state = {
-  territories: [],
-  places: [],
-  challenges: [],
-  activeChip: "places",
-  map: null,
-  territoryLayer: null,
-  placesLayer: null,
-  challengeLayer: null,
-};
-
-const getWhatsAppLink = (text) => {
-  const message = encodeURIComponent(text);
-  return `https://wa.me/${PUBLIC_WHATSAPP}?text=${message}`;
-};
+const getWhatsAppLink = (text) =>
+  `https://wa.me/${PUBLIC_WHATSAPP}?text=${encodeURIComponent(text)}`;
 
 const setWhatsappLinks = () => {
   const baseText = "inmoovi:start source=landing";
@@ -75,24 +67,21 @@ const setWhatsappLinks = () => {
   });
 };
 
-const fetchTerritories = async ({ bbox, z }) => {
-  const url = `${API_BASE}/api/map/territories?bbox=${bbox.join(",")}&z=${z}`;
-  const response = await fetch(url);
+const fetchChallenges = async () => {
+  const response = await fetch(`${API_BASE}/api/challenges`);
+  if (!response.ok) throw new Error("challenges fetch failed");
+  return response.json();
+};
+
+const fetchTerritories = async () => {
+  const response = await fetch(`${API_BASE}/api/map/territories`);
   if (!response.ok) throw new Error("territories fetch failed");
   return response.json();
 };
 
-const fetchPlaces = async ({ city }) => {
-  const url = `${API_BASE}/api/map/places?city=${encodeURIComponent(city)}`;
-  const response = await fetch(url);
+const fetchPlaces = async () => {
+  const response = await fetch(`${API_BASE}/api/map/places`);
   if (!response.ok) throw new Error("places fetch failed");
-  return response.json();
-};
-
-const fetchChallenges = async () => {
-  const url = `${API_BASE}/api/challenges`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error("challenges fetch failed");
   return response.json();
 };
 
@@ -119,6 +108,20 @@ const closeSheet = () => {
   overlay.setAttribute("aria-hidden", "true");
 };
 
+const openDrawer = () => {
+  drawer.classList.add("is-visible");
+  overlay.classList.add("is-visible");
+  drawer.setAttribute("aria-hidden", "false");
+  overlay.setAttribute("aria-hidden", "false");
+};
+
+const closeDrawer = () => {
+  drawer.classList.remove("is-visible");
+  overlay.classList.remove("is-visible");
+  drawer.setAttribute("aria-hidden", "true");
+  overlay.setAttribute("aria-hidden", "true");
+};
+
 const openModal = (id) => {
   const modal = document.getElementById(`modal-${id}`);
   if (!modal) return;
@@ -131,279 +134,147 @@ const closeModal = (modal) => {
   modal.setAttribute("aria-hidden", "true");
 };
 
-const buildTerritorySheet = (territory) => {
-  const dominance = territory.consistency >= 90 ? "Consistencia" : "Velocidade";
-  const link = getWhatsAppLink(
-    `inmoovi:start source=landing territory=${territory.id} takeover=true`
-  );
-  return `
-    <h4>🟦 ${territory.label}</h4>
-    <div class="place-meta">Dominio: ${dominance}</div>
-    <div class="place-meta">Streak: ${territory.streakWeeks} semanas</div>
-    <div class="place-meta">Consistencia: ${territory.consistency}/100</div>
-    <div class="place-meta">Pico: ${territory.peak}</div>
-    <div class="place-meta">Bom pra: ${territory.goodFor}</div>
-    <div class="sheet-actions">
-      <a class="btn btn-primary" href="${link}">Tomar posto</a>
-      <button class="btn btn-ghost" data-scroll="lugares">Ver lugares perto</button>
-    </div>
-  `;
-};
-
-const buildPlaceSheet = (place) => {
-  const link = getWhatsAppLink(`inmoovi:start source=landing place=${place.id}`);
-  return `
-    <h4>${place.name}</h4>
-    <div class="place-meta">${place.description}</div>
-    <div class="place-meta">Tags: ${place.tags.join(" / ")}</div>
-    <div class="place-meta">Melhor horario: ${place.bestTime}</div>
-    <div class="sheet-actions">
-      <a class="btn btn-primary" href="${link}">Enviar pro meu WhatsApp</a>
-      <button class="btn btn-ghost" data-scroll="mapa">Voltar ao mapa</button>
-    </div>
-  `;
-};
-
 const buildChallengeSheet = (challenge) => {
-  const link = getWhatsAppLink(`inmoovi:start source=landing challenge=${challenge.id}`);
+  const text = challenge.link || `inmoovi:start source=landing challenge=${challenge.id}`;
+  const link = getWhatsAppLink(text);
   return `
     <h4>🏁 ${challenge.title}</h4>
-    <div class="place-meta">${challenge.goal}</div>
-    <div class="place-meta">Tag: ${challenge.tag}</div>
+    <div class="challenge-meta">${challenge.location || "Uberaba"}</div>
+    <div class="challenge-meta">Regras: ${challenge.rules || "Complete o desafio"}</div>
+    <div class="challenge-meta">Termina em: ${challenge.endsIn || "-"}</div>
     <div class="sheet-actions">
       <a class="btn btn-primary" href="${link}">Entrar no desafio</a>
-      <button class="btn btn-ghost" data-scroll="mapa">Voltar ao mapa</button>
+      <button class="btn btn-ghost" data-scroll="desafios">Voltar ao mapa</button>
     </div>
   `;
 };
 
-const renderPlaces = (places) => {
-  placesGrid.innerHTML = "";
-  places.forEach((place) => {
-    const card = document.createElement("article");
-    card.className = "place-card";
-    card.innerHTML = `
-      <button class="place-button" data-place-id="${place.id}">
-        <div class="place-image"></div>
-        <h3>${place.name}</h3>
-        <div class="place-tags">
-          ${place.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
-        </div>
-        <div class="place-meta">Melhor horario: ${place.bestTime}</div>
+const renderChallengeList = (container, challenges) => {
+  container.innerHTML = "";
+  challenges.forEach((challenge) => {
+    const item = document.createElement("div");
+    item.className = "challenge-item";
+    item.innerHTML = `
+      <button type="button" data-challenge-id="${challenge.id}">
+        <strong>${challenge.title}</strong>
+        <div class="challenge-meta">${challenge.location || "Uberaba"}</div>
+        <div class="challenge-meta">${challenge.rules || "Desafio semanal"}</div>
       </button>
     `;
-    placesGrid.appendChild(card);
+    container.appendChild(item);
   });
 };
 
+const handleChallengeClick = (event) => {
+  const button = event.target.closest("button[data-challenge-id]");
+  if (!button) return;
+  const challenge = state.challenges.find((item) => item.id === button.dataset.challengeId);
+  if (!challenge) return;
+  const coords = getChallengeCoords(challenge);
+  if (coords) {
+    state.map.setView([coords.lat, coords.lng], 14, { animate: true });
+  }
+  openSheet(buildChallengeSheet(challenge));
+};
+
+const getChallengeCoords = (challenge) => {
+  if (challenge.coords && typeof challenge.coords.lat === "number") {
+    return { lat: challenge.coords.lat, lng: challenge.coords.lng };
+  }
+  if (typeof challenge.lat === "number" && typeof challenge.lng === "number") {
+    return { lat: challenge.lat, lng: challenge.lng };
+  }
+  if (challenge.location) {
+    const place = state.places.find((item) => item.name === challenge.location);
+    if (place) {
+      return { lat: place.lat, lng: place.lng };
+    }
+  }
+  return null;
+};
+
 const initMap = () => {
-  const map = L.map(mapEl, { zoomControl: false }).setView([-19.752, -47.932], 13);
+  const map = L.map(mapEl, { zoomControl: false }).setView([-19.75, -47.93], 13);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
     attribution: "&copy; OpenStreetMap",
   }).addTo(map);
   L.tileLayer("https://heatmap-external-{s}.strava.com/tiles/run/hot/{z}/{x}/{y}.png", {
     maxZoom: 18,
-    opacity: 0.65,
+    opacity: 0.55,
     attribution: "Heatmap data &copy; Strava",
   }).addTo(map);
   state.map = map;
-  state.territoryLayer = L.layerGroup().addTo(map);
-  state.placesLayer = L.layerGroup().addTo(map);
   state.challengeLayer = L.layerGroup().addTo(map);
   return map;
 };
 
-const renderTerritories = (territories) => {
-  state.territoryLayer.clearLayers();
-  territories.forEach((territory) => {
-    const icon = L.divIcon({
-      className: "",
-      html: `<div class="hex-marker" data-id="${territory.id}"></div>`,
-      iconSize: [34, 30],
-      iconAnchor: [17, 15],
-    });
-    const marker = L.marker([territory.lat, territory.lng], { icon });
-    marker.on("click", () => {
-      openSheet(buildTerritorySheet(territory));
-    });
-    marker.addTo(state.territoryLayer);
-  });
-};
-
-const renderPlacesPins = (places) => {
-  state.placesLayer.clearLayers();
-  places.forEach((place) => {
-    const icon = L.divIcon({
-      className: "",
-      html: `<div class="pin-marker"></div>`,
-      iconSize: [12, 12],
-      iconAnchor: [6, 6],
-    });
-    const marker = L.marker([place.lat, place.lng], { icon });
-    marker.on("click", () => {
-      openSheet(buildPlaceSheet(place));
-    });
-    marker.addTo(state.placesLayer);
-  });
-};
-
-const getChallengeCoords = (challenge) => {
-  if (typeof challenge.lat === "number" && typeof challenge.lng === "number") {
-    return { lat: challenge.lat, lng: challenge.lng };
-  }
-  if (challenge.territoryId) {
-    const match = state.territories.find((territory) => territory.id === challenge.territoryId);
-    if (match) {
-      return { lat: match.lat, lng: match.lng };
-    }
-  }
-  return null;
-};
-
-const renderChallenges = (challenges) => {
+const renderChallengesOnMap = (challenges) => {
   state.challengeLayer.clearLayers();
   challenges.forEach((challenge) => {
     const coords = getChallengeCoords(challenge);
-    if (!coords) {
-      return;
-    }
+    if (!coords) return;
     const icon = L.divIcon({
       className: "",
       html: `<div class="challenge-marker">🏁</div>`,
-      iconSize: [36, 36],
-      iconAnchor: [18, 18],
+      iconSize: [34, 34],
+      iconAnchor: [17, 17],
     });
     const marker = L.marker([coords.lat, coords.lng], { icon });
-    marker.on("click", () => {
-      openSheet(buildChallengeSheet(challenge));
-    });
+    marker.on("click", () => openSheet(buildChallengeSheet(challenge)));
     marker.addTo(state.challengeLayer);
   });
 };
 
-const highlightDominant = () => {
-  const top = [...state.territories].sort((a, b) => b.score - a.score).slice(0, 2);
-  document.querySelectorAll(".hex-marker").forEach((hex) => {
-    const match = top.find((item) => item.id === hex.dataset.id);
-    if (match) {
-      hex.classList.add("is-dominant");
-    } else {
-      hex.classList.remove("is-dominant");
-    }
-  });
-};
-
-const highlightBestTime = () => {
-  const hour = new Date().getHours();
-  const matchIds = state.territories
-    .filter((territory) => {
-      const parts = territory.peak.split("-");
-      const start = parseInt(parts[0], 10);
-      const end = parseInt(parts[1], 10);
-      return hour >= start && hour <= end;
-    })
-    .map((territory) => territory.id);
-
-  document.querySelectorAll(".hex-marker").forEach((hex) => {
-    if (matchIds.includes(hex.dataset.id)) {
-      hex.classList.add("is-dominant");
-    } else {
-      hex.classList.remove("is-dominant");
-    }
-  });
-};
-
-const renderChallengesBadges = (challenges) => {
-  mapBadges.innerHTML = "";
-  challenges.forEach((challenge) => {
-    const badge = document.createElement("span");
-    badge.className = "badge";
-    badge.textContent = challenge.tag || challenge.title;
-    mapBadges.appendChild(badge);
-  });
-};
-
-const ensureChallenges = (challenges, places) => {
+const ensureChallenges = (challenges, places, fallbackPool) => {
   if (challenges.length >= 3) return challenges;
   const needed = 3 - challenges.length;
-  const picks = [...places]
+  const source = places.length ? places : fallbackPool;
+  const picks = [...source]
+    .filter((item) => typeof item.lat === "number" && typeof item.lng === "number")
     .sort((a, b) => a.name.localeCompare(b.name))
     .slice(0, needed)
-    .map((place, index) => ({
+    .map((item, index) => ({
       id: `fallback-${index + 1}`,
-      title: `${place.name} - Desafio da semana`,
-      goal: "Complete 5 km em qualquer ritmo",
-      tag: "Desafio 5k",
-      lat: place.lat,
-      lng: place.lng,
+      title: `${item.name} - Desafio da semana`,
+      location: item.name,
+      coords: { lat: item.lat, lng: item.lng },
+      rules: "Complete 5 km em qualquer ritmo",
+      endsIn: "6 dias",
+      link: `inmoovi:start source=landing challenge=fallback-${index + 1}`,
     }));
   return [...challenges, ...picks];
 };
 
-const updateChipState = (chip) => {
-  chipButtons.forEach((button) => button.classList.remove("is-active"));
-  chip.classList.add("is-active");
-  state.activeChip = chip.dataset.chip;
-
-  const isCollapsed = mapEl.parentElement.classList.contains("is-collapsed");
-  mapBadges.classList.toggle("is-visible", state.activeChip === "challenges" && !isCollapsed);
-
-  if (state.activeChip === "places") {
-    state.map.addLayer(state.placesLayer);
-    state.map.removeLayer(state.challengeLayer);
-    highlightDominant();
-  }
-
-  if (state.activeChip === "dominance") {
-    highlightDominant();
-    state.map.removeLayer(state.placesLayer);
-    state.map.removeLayer(state.challengeLayer);
-  }
-
-  if (state.activeChip === "best-time") {
-    highlightBestTime();
-    state.map.removeLayer(state.placesLayer);
-    state.map.removeLayer(state.challengeLayer);
-  }
-
-  if (state.activeChip === "challenges") {
-    highlightDominant();
-    state.map.addLayer(state.placesLayer);
-    state.map.addLayer(state.challengeLayer);
-  }
+const hydrateChallenges = () => {
+  const hasChallenges = state.challenges.length > 0;
+  challengeEmpty.classList.toggle("is-visible", !hasChallenges);
+  drawerEmpty.classList.toggle("is-visible", !hasChallenges);
+  if (!hasChallenges) return;
+  renderChallengeList(challengeList, state.challenges);
+  renderChallengeList(drawerList, state.challenges);
+  renderChallengesOnMap(state.challenges);
 };
 
-const setupChipListeners = () => {
-  chipButtons.forEach((chip) => {
-    chip.addEventListener("click", () => updateChipState(chip));
+const setupEvents = () => {
+  overlay.addEventListener("click", () => {
+    closeSheet();
+    closeDrawer();
   });
-};
 
-const setupPlaceListeners = () => {
-  placesGrid.addEventListener("click", (event) => {
-    const button = event.target.closest(".place-button");
-    if (!button) return;
-    const place = state.places.find((item) => item.id === button.dataset.placeId);
-    if (!place) return;
-    openSheet(buildPlaceSheet(place));
-  });
-};
-
-const setupSheetButtons = () => {
   sheet.addEventListener("click", (event) => {
     const scrollTarget = event.target.getAttribute("data-scroll");
     if (!scrollTarget) return;
     closeSheet();
     document.getElementById(scrollTarget).scrollIntoView({ behavior: "smooth" });
   });
-};
 
-const setupOverlay = () => {
-  overlay.addEventListener("click", closeSheet);
-};
+  drawerOpen.addEventListener("click", openDrawer);
+  drawerClose.addEventListener("click", closeDrawer);
 
-const setupModals = () => {
+  challengeList.addEventListener("click", handleChallengeClick);
+  drawerList.addEventListener("click", handleChallengeClick);
+
   modalTriggers.forEach((button) => {
     button.addEventListener("click", () => openModal(button.dataset.openModal));
   });
@@ -422,90 +293,30 @@ const setupModals = () => {
   });
 };
 
-const setupSheetDrag = () => {
-  let startY = 0;
-  let currentY = 0;
-  let isDragging = false;
-
-  sheet.addEventListener("touchstart", (event) => {
-    startY = event.touches[0].clientY;
-    isDragging = true;
-  });
-
-  sheet.addEventListener("touchmove", (event) => {
-    if (!isDragging) return;
-    currentY = event.touches[0].clientY;
-    const diff = currentY - startY;
-    if (diff > 0) {
-      sheet.style.transform = `translateY(${diff}px)`;
-    }
-  });
-
-  sheet.addEventListener("touchend", () => {
-    isDragging = false;
-    const diff = currentY - startY;
-    sheet.style.transform = "translateY(0)";
-    if (diff > 120) closeSheet();
-  });
-};
-
-const setupMapToggle = () => {
-  if (!mapToggle) return;
-  mapToggle.addEventListener("click", () => {
-    const isCollapsed = mapEl.parentElement.classList.toggle("is-collapsed");
-    mapToggle.setAttribute("aria-pressed", isCollapsed ? "true" : "false");
-    mapToggle.textContent = isCollapsed ? "Abrir mapa" : "Fechar mapa";
-    mapBadges.classList.toggle("is-visible", state.activeChip === "challenges" && !isCollapsed);
-    if (!isCollapsed) {
-      setTimeout(() => {
-        state.map.invalidateSize();
-      }, 200);
-    }
-  });
-};
-
 const loadData = async () => {
   showSkeleton();
-  const map = state.map;
-  const bounds = map.getBounds();
-  const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
+  const results = await Promise.allSettled([fetchChallenges(), fetchTerritories(), fetchPlaces()]);
+  const [challengesResult, territoriesResult, placesResult] = results;
 
-  const results = await Promise.allSettled([
-    fetchTerritories({ bbox, z: map.getZoom() }),
-    fetchPlaces({ city: "Uberlandia" }),
-    fetchChallenges(),
-  ]);
-
-  const [territoriesResult, placesResult, challengesResult] = results;
+  state.places = placesResult.status === "fulfilled" ? placesResult.value : [];
   state.territories = territoriesResult.status === "fulfilled" ? territoriesResult.value : [];
-  state.places = placesResult.status === "fulfilled" ? placesResult.value : mocks.places;
-  const baseChallenges = challengesResult.status === "fulfilled" ? challengesResult.value : [];
-  state.challenges = ensureChallenges(baseChallenges, state.places);
+
+  const baseChallenges = challengesResult.status === "fulfilled" ? challengesResult.value : mocks.challenges;
+  const fallbackPool = mocks.challenges.map((item) => ({
+    name: item.location || item.title,
+    lat: item.coords?.lat,
+    lng: item.coords?.lng,
+  }));
+  state.challenges = ensureChallenges(baseChallenges, state.places, fallbackPool);
 
   hideSkeleton();
-
-  renderTerritories(state.territories);
-  renderPlacesPins(state.places);
-  renderChallenges(state.challenges);
-  renderPlaces(state.places);
-  renderChallengesBadges(state.challenges);
-  highlightDominant();
+  hydrateChallenges();
 };
 
 const init = () => {
   setWhatsappLinks();
   initMap();
-  const activeChip = document.querySelector(".chip.is-active");
-  if (activeChip) {
-    updateChipState(activeChip);
-  }
-  setupChipListeners();
-  setupPlaceListeners();
-  setupSheetButtons();
-  setupOverlay();
-  setupModals();
-  setupSheetDrag();
-  setupMapToggle();
+  setupEvents();
   loadData();
 };
 
